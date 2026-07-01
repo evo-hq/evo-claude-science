@@ -9,13 +9,13 @@ Science user installs so evo's optimization loop runs inside the CS workspace.
 ## Install
 
 **Add this repo as a skill source in Claude Science** (`evo-hq/evo-claude-science`).
-The importer picks up `skills/evo-autoresearch-claude-science-setup/SKILL.md`.
+The importer picks up `skills/evo-autoresearch-install/SKILL.md`.
 
 Or paste this into a Claude Science chat:
 
 > Install the skill at
-> `https://raw.githubusercontent.com/evo-hq/evo-claude-science/main/skills/evo-autoresearch-claude-science-setup/SKILL.md`
-> — publish it via host.skills as `evo-autoresearch-claude-science-setup` and run it.
+> `https://raw.githubusercontent.com/evo-hq/evo-claude-science/main/skills/evo-autoresearch-install/SKILL.md`
+> — publish it via host.skills as `evo-autoresearch-install` and run it.
 
 Either way the skill then fetches evo's driving-skills and publishes them into
 your catalog, installs the evo CLI, and configures the `gitdir` backend so

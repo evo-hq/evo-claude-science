@@ -1,5 +1,5 @@
 ---
-name: evo-autoresearch-claude-science-setup
+name: evo-autoresearch-install
 description: One-time setup that makes evo (github.com/evo-hq/evo) autoresearch runnable inside this Claude Science workspace. Use when the user wants to install or set up evo, run structured autoresearch, or optimize code / a config / a pipeline against a metric and wants evo's durable gated optimization loop available here. Fetches evo's driving-skills into the catalog, installs the evo CLI, and configures a sandbox-safe git backend. After this, invoke evo-discover on a target.
 ---
 
@@ -47,11 +47,11 @@ install` and any user-default read/write fail with `Operation not permitted:
 
 ### 1. Fetch evo — codeload tarball, not git clone
 `git clone` fails in the sandbox (`.git` creation blocked). Use the public
-tarball for the pinned release (no credentials needed); the tag must match the
-CLI version in step 2 so `discover`'s version check agrees.
+tarball of `main` (no credentials needed). Both this and the CLI in step 2
+track the latest release, so `discover`'s version check agrees.
 ```bash
 cd "$PWD"   # the CS workspace dir
-curl -fsSL https://codeload.github.com/evo-hq/evo/tar.gz/refs/tags/v0.7.0-alpha.3 -o _evo.tgz
+curl -fsSL https://codeload.github.com/evo-hq/evo/tar.gz/refs/heads/main -o _evo.tgz
 mkdir -p _evo_src && tar xzf _evo.tgz -C _evo_src --strip-components=1
 ls _evo_src/plugins/evo/skills   # discover optimize subagent report ship finetuning infra-setup
 ```
@@ -60,17 +60,17 @@ ls _evo_src/plugins/evo/skills   # discover optimize subagent report ship finetu
 A session-scoped `pip install` lives only in the current kernel's ephemeral
 overlay; delegated child frames run their own kernel and won't inherit it, so
 evo's optimize loop (which fans out to child subagents) would hit `evo:
-command not found`. Install the pinned release into the **shared/base python
+command not found`. Install the latest release into the **shared/base python
 environment** so every kernel inherits it:
 ```python
 # python/repl tool — install durably; when prompted, target the shared base env
-manage_packages(mode="install", packages=["evo-hq-cli==0.7.0a3"])
+manage_packages(mode="install", packages=["evo-hq-cli"])
 ```
 Then confirm `evo --version`; if you'll delegate, re-check `which evo` from a
-fresh child frame. This release ships the `.git`-free `gitdir` backend (step 4),
+fresh child frame. evo 0.7.0+ ships the `.git`-free `gitdir` backend (step 4),
 and its workspace-local `EVO_HOME` fallback means child frames get a writable
-evo home with no inherited env. (Bare `pip install "evo-hq-cli==0.7.0a3"` also
-works but only in the current kernel — fine if you never delegate.)
+evo home with no inherited env. (Bare `pip install evo-hq-cli` also works but
+only in the current kernel — fine if you never delegate.)
 
 ### 3. Publish evo's driving-skills into the catalog
 The `repl` kernel can't see granted host paths, only the workspace — the tarball
