@@ -71,17 +71,20 @@ for d in sorted(p for p in base.iterdir() if (p / "SKILL.md").is_file()):
 print("published:", published)
 ```
 
-### 4. Configure the sandbox-safe git backend
-evo's default `worktree` backend needs `.git`, which is blocked. Set the
-`gitdir` backend as the workspace default:
+### 4. Enable evo's sandbox git mode
+evo's default `worktree` backend needs `.git`, which is blocked. Run the
+Claude Science host install once; it sets the machine default so every new
+workspace uses the `.git`-free `gitdir` backend:
 ```bash
-evo config backend gitdir     # relocates GIT_DIR off the blocked .git name
+evo install claude-science
 ```
-The `gitdir` backend isolates each experiment with a relocated `GIT_DIR` and a
-working tree that contains no `.git`, so evo's gated loop runs in the sandbox.
-If `evo config backend gitdir` errors with an unknown backend, the installed
-CLI predates the backend (step 2 installs from the branch that ships it) — say
-so to the user instead of proceeding.
+After this, when `evo-discover` runs `evo init`, it relocates the base repo off
+`.git` (metadata under `.evo/basegit`, a baseline commit, no `.git` anywhere)
+and every later `evo` command re-applies the relocated `GIT_DIR` automatically.
+Nothing about the git workflow changes — same commits, diffs, branches, just a
+renamed metadata dir. If `evo install claude-science` errors with an unknown
+host, the installed CLI predates it (step 2 installs from the branch that
+ships it) — say so instead of proceeding.
 
 ### 5. Verify and hand off
 Confirm `evo --version` runs and the `evo-*` skills are in
@@ -89,6 +92,17 @@ Confirm `evo --version` runs and the `evo-*` skills are in
 begin they invoke `evo-discover` on the repo/pipeline they want to optimize —
 that defines the metric + gate and commits a baseline, the first
 compute-spending step, which waits for their okay.
+
+## Running experiments on Modal / SSH (optional)
+Base relocation and where experiments *execute* are independent. To keep the
+git workflow local (relocated, sandbox-safe) but run the actual compute on the
+user's Modal account or an SSH host, set a remote backend after discover:
+```bash
+evo config backend remote --provider modal    # or: --remote ssh:<host>
+```
+The local base stays `.git`-free; evo ships each experiment to the container
+(which has normal `.git`) and harvests the result. No gitdir-specific change is
+needed — it composes.
 
 ## Notes
 - Clean up `_evo.tgz` / `_evo_src` after publishing.
