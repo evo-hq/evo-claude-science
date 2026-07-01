@@ -131,6 +131,28 @@ The local base stays `.git`-free; evo ships each experiment to the container
 (which has normal `.git`) and harvests the result. No gitdir-specific change is
 needed — it composes.
 
+## Optional: live dashboard tile
+For a live, self-refreshing dashboard (experiment tree, frontier, scores) as an
+in-chat tile, add the `evo-mcp` connector. Two parts, and they split between
+agent and human:
+
+1. Install `evo-mcp` (the agent can do this, in the shared python env):
+   ```bash
+   pip install "git+https://github.com/evo-hq/evo-claude-science.git#subdirectory=evo-mcp"
+   ```
+   (or run it without installing: `uvx --from
+   "git+https://github.com/evo-hq/evo-claude-science.git#subdirectory=evo-mcp" evo-mcp`.)
+2. Add the connector (**human**, web UI — the agent cannot create a custom
+   connector): Customize → Connectors → Add → **Local command**. Command:
+   `evo-mcp`. Under Advanced settings, set env `EVO_WORKSPACE` to this project's
+   workspace path (or leave it if CS spawns the connector in the workspace).
+
+Once connected, `evo-mcp` exposes a `ui://evo/dashboard` MCP-App tile: a live
+iframe that polls the run's `graph.json` every few seconds and renders the tree.
+No port is bound, so it works inside the sandbox. It reads the same workspace
+this skill set up; the search itself runs fine without it (use `evo status` /
+`evo tree` otherwise).
+
 ## Notes
 - Clean up `_evo.tgz` / `_evo_src` after publishing.
 - The evo driving-skills are written in host dialect (they mention Bash,
