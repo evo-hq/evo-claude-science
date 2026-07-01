@@ -136,16 +136,19 @@ For a live, self-refreshing dashboard (experiment tree, frontier, scores) as an
 in-chat tile, add the `evo-mcp` connector. Two parts, and they split between
 agent and human:
 
-1. Install `evo-mcp` (the agent can do this, in the shared python env):
+1. Install `evo-mcp` to a fixed absolute path (`uv tool`, like the evo CLI):
    ```bash
-   pip install "git+https://github.com/evo-hq/evo-claude-science.git#subdirectory=evo-mcp"
+   uv tool install "git+https://github.com/evo-hq/evo-claude-science.git#subdirectory=evo-mcp"
+   # -> installs the `evo-mcp` executable at ~/.local/bin/evo-mcp
    ```
-   (or run it without installing: `uvx --from
-   "git+https://github.com/evo-hq/evo-claude-science.git#subdirectory=evo-mcp" evo-mcp`.)
+   Do NOT use a bare `uvx …`/`evo-mcp` command in the connector: CS spawns the
+   connector with a minimal PATH, so a bare name fails with
+   `execvp ... No such file or directory`. Use the absolute path below.
 2. Add the connector (**human**, web UI — the agent cannot create a custom
-   connector): Customize → Connectors → Add → **Local command**. Command:
-   `evo-mcp`. Under Advanced settings, set env `EVO_WORKSPACE` to this project's
-   workspace path (or leave it if CS spawns the connector in the workspace).
+   connector): Customize → Connectors → Add → **Local command**. Command: the
+   absolute path from step 1, e.g. `/Users/<you>/.local/bin/evo-mcp` (run
+   `which evo-mcp` to get it). Under Advanced settings, set env `EVO_WORKSPACE`
+   to this project's workspace absolute path.
 
 Once connected, `evo-mcp` exposes a `ui://evo/dashboard` MCP-App tile: a live
 iframe that polls the run's `graph.json` every few seconds and renders the tree.
