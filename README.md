@@ -3,19 +3,24 @@
 Run [evo](https://github.com/evo-hq/evo) autoresearch inside Claude Science.
 
 evo is a durable, git-backed, gated tree-search that optimizes code (or any
-benchmarkable objective). This repo is the one-time setup a Claude Science user
-installs so evo's optimization loop runs inside the CS workspace.
+benchmarkable objective). This repo ships the one-time setup skill a Claude
+Science user installs so evo's optimization loop runs inside the CS workspace.
 
-## Install (one paste in a Claude Science chat)
+## Install
+
+**Add this repo as a skill source in Claude Science** (`evo-hq/evo-claude-science`).
+The importer picks up `skills/evo-autoresearch-claude-science-setup/SKILL.md`.
+
+Or paste this into a Claude Science chat:
 
 > Install the skill at
-> `https://raw.githubusercontent.com/evo-hq/evo-claude-science/main/SKILL.md`
+> `https://raw.githubusercontent.com/evo-hq/evo-claude-science/main/skills/evo-autoresearch-claude-science-setup/SKILL.md`
 > — publish it via host.skills as `evo-autoresearch-claude-science-setup` and run it.
 
-The skill then fetches evo's driving-skills and publishes them into your
-catalog, installs the evo CLI, and configures the `gitdir` backend so evo's git
-layer works inside the sandbox. After setup, ask for an optimization ("tune X
-against metric Y") and evo's loop runs.
+Either way the skill then fetches evo's driving-skills and publishes them into
+your catalog, installs the evo CLI, and configures the `gitdir` backend so
+evo's git layer works inside the sandbox. After setup, ask for an optimization
+("tune X against metric Y") and evo's loop runs.
 
 ## Why a dedicated git backend
 
