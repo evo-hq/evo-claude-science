@@ -34,20 +34,20 @@ but not memory, so stage files into the workspace first.
 
 ### 1. Fetch evo — codeload tarball, not git clone
 `git clone` fails in the sandbox (`.git` creation blocked). Use the public
-tarball (no credentials needed):
+tarball for the pinned release (no credentials needed); the tag must match the
+CLI version in step 2 so `discover`'s version check agrees.
 ```bash
 cd "$PWD"   # the CS workspace dir
-curl -fsSL https://codeload.github.com/evo-hq/evo/tar.gz/refs/heads/main -o _evo.tgz
+curl -fsSL https://codeload.github.com/evo-hq/evo/tar.gz/refs/tags/v0.7.0-alpha.1 -o _evo.tgz
 mkdir -p _evo_src && tar xzf _evo.tgz -C _evo_src --strip-components=1
 ls _evo_src/plugins/evo/skills   # discover optimize subagent report ship finetuning infra-setup
 ```
 
 ### 2. Install the evo CLI
-The `gitdir` backend (step 4) needs a build that ships it. Until it lands in a
-PyPI release, install from the branch; switch to `pip install evo-hq-cli` once
-released.
+Install the pinned release from PyPI (this version ships the `.git`-free
+`gitdir` backend used in step 4):
 ```bash
-pip install -q "git+https://github.com/evo-hq/evo.git@gitdir-backend#subdirectory=plugins/evo" && evo --version
+pip install -q "evo-hq-cli==0.7.0a1" && evo --version
 ```
 
 ### 3. Publish evo's driving-skills into the catalog
@@ -83,8 +83,8 @@ After this, when `evo-discover` runs `evo init`, it relocates the base repo off
 and every later `evo` command re-applies the relocated `GIT_DIR` automatically.
 Nothing about the git workflow changes — same commits, diffs, branches, just a
 renamed metadata dir. If `evo install claude-science` errors with an unknown
-host, the installed CLI predates it (step 2 installs from the branch that
-ships it) — say so instead of proceeding.
+host, the installed CLI predates it (step 2 pins the release that ships it) —
+say so instead of proceeding.
 
 ### 5. Verify and hand off
 Confirm `evo --version` runs and the `evo-*` skills are in
