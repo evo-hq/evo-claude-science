@@ -51,7 +51,7 @@ tarball for the pinned release (no credentials needed); the tag must match the
 CLI version in step 2 so `discover`'s version check agrees.
 ```bash
 cd "$PWD"   # the CS workspace dir
-curl -fsSL https://codeload.github.com/evo-hq/evo/tar.gz/refs/tags/v0.7.0-alpha.2 -o _evo.tgz
+curl -fsSL https://codeload.github.com/evo-hq/evo/tar.gz/refs/tags/v0.7.0-alpha.3 -o _evo.tgz
 mkdir -p _evo_src && tar xzf _evo.tgz -C _evo_src --strip-components=1
 ls _evo_src/plugins/evo/skills   # discover optimize subagent report ship finetuning infra-setup
 ```
@@ -64,12 +64,12 @@ command not found`. Install the pinned release into the **shared/base python
 environment** so every kernel inherits it:
 ```python
 # python/repl tool — install durably; when prompted, target the shared base env
-manage_packages(mode="install", packages=["evo-hq-cli==0.7.0a2"])
+manage_packages(mode="install", packages=["evo-hq-cli==0.7.0a3"])
 ```
 Then confirm `evo --version`; if you'll delegate, re-check `which evo` from a
 fresh child frame. This release ships the `.git`-free `gitdir` backend (step 4),
 and its workspace-local `EVO_HOME` fallback means child frames get a writable
-evo home with no inherited env. (Bare `pip install "evo-hq-cli==0.7.0a2"` also
+evo home with no inherited env. (Bare `pip install "evo-hq-cli==0.7.0a3"` also
 works but only in the current kernel — fine if you never delegate.)
 
 ### 3. Publish evo's driving-skills into the catalog
@@ -130,31 +130,6 @@ evo config backend remote --provider modal    # or: --remote ssh:<host>
 The local base stays `.git`-free; evo ships each experiment to the container
 (which has normal `.git`) and harvests the result. No gitdir-specific change is
 needed — it composes.
-
-## Optional: live dashboard tile
-For a live, self-refreshing dashboard (experiment tree, frontier, scores) as an
-in-chat tile, add the `evo-mcp` connector. Two parts, and they split between
-agent and human:
-
-1. Install `evo-mcp` to a fixed absolute path (`uv tool`, like the evo CLI):
-   ```bash
-   uv tool install "git+https://github.com/evo-hq/evo-claude-science.git#subdirectory=evo-mcp"
-   # -> installs the `evo-mcp` executable at ~/.local/bin/evo-mcp
-   ```
-   Do NOT use a bare `uvx …`/`evo-mcp` command in the connector: CS spawns the
-   connector with a minimal PATH, so a bare name fails with
-   `execvp ... No such file or directory`. Use the absolute path below.
-2. Add the connector (**human**, web UI — the agent cannot create a custom
-   connector): Customize → Connectors → Add → **Local command**. Command: the
-   absolute path from step 1, e.g. `/Users/<you>/.local/bin/evo-mcp` (run
-   `which evo-mcp` to get it). Under Advanced settings, set env `EVO_WORKSPACE`
-   to this project's workspace absolute path.
-
-Once connected, `evo-mcp` exposes a `ui://evo/dashboard` MCP-App tile: a live
-iframe that polls the run's `graph.json` every few seconds and renders the tree.
-No port is bound, so it works inside the sandbox. It reads the same workspace
-this skill set up; the search itself runs fine without it (use `evo status` /
-`evo tree` otherwise).
 
 ## Notes
 - Clean up `_evo.tgz` / `_evo_src` after publishing.
