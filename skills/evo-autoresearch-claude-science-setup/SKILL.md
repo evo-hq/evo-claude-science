@@ -51,7 +51,7 @@ tarball for the pinned release (no credentials needed); the tag must match the
 CLI version in step 2 so `discover`'s version check agrees.
 ```bash
 cd "$PWD"   # the CS workspace dir
-curl -fsSL https://codeload.github.com/evo-hq/evo/tar.gz/refs/tags/v0.7.0-alpha.1 -o _evo.tgz
+curl -fsSL https://codeload.github.com/evo-hq/evo/tar.gz/refs/tags/v0.7.0-alpha.2 -o _evo.tgz
 mkdir -p _evo_src && tar xzf _evo.tgz -C _evo_src --strip-components=1
 ls _evo_src/plugins/evo/skills   # discover optimize subagent report ship finetuning infra-setup
 ```
