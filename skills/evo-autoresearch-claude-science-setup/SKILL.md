@@ -56,12 +56,21 @@ mkdir -p _evo_src && tar xzf _evo.tgz -C _evo_src --strip-components=1
 ls _evo_src/plugins/evo/skills   # discover optimize subagent report ship finetuning infra-setup
 ```
 
-### 2. Install the evo CLI
-Install the pinned release from PyPI (this version ships the `.git`-free
-`gitdir` backend used in step 4):
-```bash
-pip install -q "evo-hq-cli==0.7.0a1" && evo --version
+### 2. Install the evo CLI into the shared python env (so child frames see it)
+A session-scoped `pip install` lives only in the current kernel's ephemeral
+overlay; delegated child frames run their own kernel and won't inherit it, so
+evo's optimize loop (which fans out to child subagents) would hit `evo:
+command not found`. Install the pinned release into the **shared/base python
+environment** so every kernel inherits it:
+```python
+# python/repl tool — install durably; when prompted, target the shared base env
+manage_packages(mode="install", packages=["evo-hq-cli==0.7.0a2"])
 ```
+Then confirm `evo --version`; if you'll delegate, re-check `which evo` from a
+fresh child frame. This release ships the `.git`-free `gitdir` backend (step 4),
+and its workspace-local `EVO_HOME` fallback means child frames get a writable
+evo home with no inherited env. (Bare `pip install "evo-hq-cli==0.7.0a2"` also
+works but only in the current kernel — fine if you never delegate.)
 
 ### 3. Publish evo's driving-skills into the catalog
 The `repl` kernel can't see granted host paths, only the workspace — the tarball
