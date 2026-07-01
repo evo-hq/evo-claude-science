@@ -32,6 +32,19 @@ Run bash/pip in the `python` tool (it has the workspace + network); run
 `host.skills.*` in the `repl` control-plane tool. They share the workspace dir
 but not memory, so stage files into the workspace first.
 
+**Redirect evo's home into the workspace first.** evo keeps user-level state
+(backend default, caches) in `~/.evo`, which the sandbox blocks. Point
+`EVO_HOME` at a workspace-local dir before any `evo` call and keep it set for
+every later call too (`evo install`, `evo-discover`, `evo run`, ...). In the
+`python` kernel this persists for the session:
+```python
+import os
+os.environ["EVO_HOME"] = os.path.join(os.getcwd(), ".evo_home")
+```
+(equivalently `export EVO_HOME="$PWD/.evo_home"` in bash). Without it, `evo
+install` and any user-default read/write fail with `Operation not permitted:
+~/.evo`.
+
 ### 1. Fetch evo — codeload tarball, not git clone
 `git clone` fails in the sandbox (`.git` creation blocked). Use the public
 tarball for the pinned release (no credentials needed); the tag must match the
@@ -76,8 +89,13 @@ evo's default `worktree` backend needs `.git`, which is blocked. Run the
 Claude Science host install once; it sets the machine default so every new
 workspace uses the `.git`-free `gitdir` backend:
 ```bash
-evo install claude-science
+evo install claude-science     # needs EVO_HOME from the preamble
 ```
+A trailing `uv tool install` warning here is harmless: evo tries to self-sync
+its CLI via `uv` (absent in the sandbox), but the backend default is already
+written (confirm with `evo config backend show` → `gitdir`). The CLI came from
+pip in step 2, so no sync is needed.
+
 After this, when `evo-discover` runs `evo init`, it relocates the base repo off
 `.git` (metadata under `.evo/basegit`, a baseline commit, no `.git` anywhere)
 and every later `evo` command re-applies the relocated `GIT_DIR` automatically.
